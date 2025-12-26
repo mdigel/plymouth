@@ -1,4 +1,10 @@
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SwipeCardz Privacy Policy | Plymouth App Labs",
+  description: "SwipeCardz Privacy Policy - Learn how we collect, use, and protect your personal data.",
+};
 
 export default function PrivacyPolicyPage() {
   return (

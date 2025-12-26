@@ -1,4 +1,10 @@
 import Image from "next/image";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SwipeCardz Support | Plymouth App Labs",
+  description: "Get support for SwipeCardz. Contact us at support@plymouthapplabs.com or through the feedback feature in the app.",
+};
 
 export default function SupportPage() {
   return (
