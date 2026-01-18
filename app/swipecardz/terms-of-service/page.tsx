@@ -279,7 +279,7 @@ export default function TermsOfServicePage() {
               If you have any questions about these Terms, please contact us at:
             </p>
             <p className="text-base leading-7 text-gray-700">
-              <strong>Email:</strong> support@swipecardz.com
+              <strong>Email:</strong> support@plymouthapplabs.com
             </p>
           </section>
 

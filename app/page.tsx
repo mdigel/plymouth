@@ -4,12 +4,13 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+type AppId = "swipecardz" | "goldenloopz" | null;
+
 export default function Home() {
   const gradientRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
+  const [activeApp, setActiveApp] = useState<AppId>(null);
+  const [hoveredApp, setHoveredApp] = useState<AppId>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const gradient = gradientRef.current;
@@ -25,34 +26,28 @@ export default function Home() {
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!imageRef.current) return;
-    
-    const rect = imageRef.current.getBoundingClientRect();
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     const mouseX = e.clientX - centerX;
     const mouseY = e.clientY - centerY;
-    
-    // Calculate tilt (max 15 degrees)
+
     const maxTilt = 15;
     const tiltX = (mouseY / (rect.height / 2)) * maxTilt;
     const tiltY = (mouseX / (rect.width / 2)) * -maxTilt;
-    
+
     setTilt({ x: tiltX, y: tiltY });
   };
 
   const handleMouseLeave = () => {
-    setIsHovered(false);
+    setHoveredApp(null);
     setTilt({ x: 0, y: 0 });
   };
 
-  const handleImageClick = () => {
-    setShowModal((prev) => !prev);
-  };
-
   const handleCloseModal = () => {
-    setShowModal(false);
+    setActiveApp(null);
   };
 
   return (
@@ -84,7 +79,7 @@ export default function Home() {
           }}
         />
       </div>
-      
+
       {/* Header */}
       <header className="relative z-10 px-8 py-6">
         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
@@ -94,64 +89,142 @@ export default function Home() {
 
       {/* Main content */}
       <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-120px)] px-8 py-16">
-        <div className="flex flex-col items-center gap-2 relative">
-          {/* Dialog Box */}
-          {showModal && (
-            <div className="absolute bottom-full mb-4 z-50">
-              <div
-                className="bg-white rounded-xl shadow-2xl p-4 w-48 border border-gray-200"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex flex-col gap-2">
-                  <Link
-                    href="/swipecardz/support"
-                    className="w-full px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors text-center text-sm"
-                    onClick={handleCloseModal}
-                  >
-                    Support
-                  </Link>
-                  <Link
-                    href="/swipecardz/privacy-policy"
-                    className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
-                    onClick={handleCloseModal}
-                  >
-                    Privacy Policy
-                  </Link>
+        <div className="flex flex-row items-start gap-12">
+          {/* SwipeCardz */}
+          <div className="flex flex-col items-center gap-2 relative">
+            {/* Dialog Box */}
+            {activeApp === "swipecardz" && (
+              <div className="absolute bottom-full mb-4 z-50">
+                <div
+                  className="bg-white rounded-xl shadow-2xl p-4 w-48 border border-gray-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      href="/swipecardz/support"
+                      className="w-full px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors text-center text-sm"
+                      onClick={handleCloseModal}
+                    >
+                      Support
+                    </Link>
+                    <Link
+                      href="/swipecardz/privacy-policy"
+                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
+                      onClick={handleCloseModal}
+                    >
+                      Privacy Policy
+                    </Link>
+                    <Link
+                      href="/swipecardz/terms-of-service"
+                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
+                      onClick={handleCloseModal}
+                    >
+                      Terms of Service
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {/* App Icon */}
-          <div
-            ref={imageRef}
-            className="relative cursor-pointer transition-transform duration-100 ease-out"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            onClick={handleImageClick}
-            style={{
-              transform: isHovered
-                ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.05)`
-                : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
-            }}
-          >
-            <Image
-              src="/swipecardz.png"
-              alt="SwipeCardz"
-              width={180}
-              height={180}
-              priority
-              className="w-[180px] h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+            )}
+
+            {/* App Icon */}
+            <div
+              className="relative cursor-pointer transition-transform duration-100 ease-out"
+              onMouseEnter={() => setHoveredApp("swipecardz")}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              onClick={() => setActiveApp(activeApp === "swipecardz" ? null : "swipecardz")}
               style={{
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                transform:
+                  hoveredApp === "swipecardz"
+                    ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.05)`
+                    : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
               }}
-            />
+            >
+              <Image
+                src="/swipecardz.png"
+                alt="SwipeCardz"
+                width={180}
+                height={180}
+                priority
+                className="w-[180px] h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                style={{
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                }}
+              />
+            </div>
+            {/* App Name Label */}
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[180px]">
+              SwipeCardz
+            </h2>
           </div>
-          {/* App Name Label */}
-          <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[180px]">
-            SwipeCardz
-          </h2>
+
+          {/* Golden Loopz */}
+          <div className="flex flex-col items-center gap-2 relative">
+            {/* Dialog Box */}
+            {activeApp === "goldenloopz" && (
+              <div className="absolute bottom-full mb-4 z-50">
+                <div
+                  className="bg-white rounded-xl shadow-2xl p-4 w-48 border border-gray-200"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      href="/goldenloopz/support"
+                      className="w-full px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors text-center text-sm"
+                      onClick={handleCloseModal}
+                    >
+                      Support
+                    </Link>
+                    <Link
+                      href="/goldenloopz/privacy-policy"
+                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
+                      onClick={handleCloseModal}
+                    >
+                      Privacy Policy
+                    </Link>
+                    <Link
+                      href="/goldenloopz/terms-of-service"
+                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
+                      onClick={handleCloseModal}
+                    >
+                      Terms of Service
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* App Icon */}
+            <div
+              className="relative cursor-pointer transition-transform duration-100 ease-out"
+              onMouseEnter={() => setHoveredApp("goldenloopz")}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              onClick={() => setActiveApp(activeApp === "goldenloopz" ? null : "goldenloopz")}
+              style={{
+                transform:
+                  hoveredApp === "goldenloopz"
+                    ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.05)`
+                    : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
+              }}
+            >
+              <Image
+                src="/goldenloopzicon.png"
+                alt="Golden Loopz"
+                width={180}
+                height={180}
+                priority
+                className="w-[180px] h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                style={{
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                }}
+              />
+            </div>
+            {/* App Name Label */}
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[180px]">
+              Golden Loopz
+            </h2>
+          </div>
         </div>
       </main>
     </div>
