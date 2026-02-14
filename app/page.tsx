@@ -4,13 +4,122 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-type AppId = "swipecardz" | "goldenloopz" | null;
+type HoveredApp = "swipecardz" | "goldenloopz" | "braintunez" | "squirrelsafe" | "whitenoize" | "repz" | null;
+type Platform = "ios" | "android" | "desktop";
+type QrApp = "swipecardz" | "goldenloopz" | null;
+type UpcomingAppId = "braintunez" | "squirrelsafe" | "whitenoize" | "repz";
+
+const UPCOMING_APPS: { id: UpcomingAppId; name: string; icon: string; subtitle: string }[] = [
+  { id: "braintunez", name: "Brain Tunez", icon: "/Focus-Icon.png", subtitle: "Timer + distraction-free music." },
+  { id: "squirrelsafe", name: "Squirrel Safe", icon: "/Photo Vault - Icon.png", subtitle: "Private photo & video vault." },
+  { id: "whitenoize", name: "White Noize", icon: "/Fan-icon.png", subtitle: "Calming noise & smart alarms." },
+  { id: "repz", name: "Repz", icon: "/Muscle-Icon.png", subtitle: "Track sets, reps & weight." },
+];
+
+const APP_STORE_LINKS = {
+  swipecardz: "https://apps.apple.com/us/app/swipecardz/id6755474814",
+  goldenloopz: "https://apps.apple.com/us/app/golden-loopz-time-tracker/id6757961830",
+};
+
+const QR_IMAGES = {
+  swipecardz: "/swipecardz_qr.svg",
+  goldenloopz: "/goldenloopz_qr.svg",
+};
+
+const QR_LABELS = {
+  swipecardz: "Swipe Cardz",
+  goldenloopz: "Golden Loopz",
+};
 
 export default function Home() {
   const gradientRef = useRef<HTMLDivElement>(null);
-  const [activeApp, setActiveApp] = useState<AppId>(null);
-  const [hoveredApp, setHoveredApp] = useState<AppId>(null);
+  const [hoveredApp, setHoveredApp] = useState<HoveredApp>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [platform, setPlatform] = useState<Platform>("desktop");
+  const [qrModal, setQrModal] = useState<QrApp>(null);
+  const [notifyModal, setNotifyModal] = useState<UpcomingAppId | null>(null);
+  const [selectedApps, setSelectedApps] = useState<Set<UpcomingAppId>>(new Set());
+  const [notifyEmail, setNotifyEmail] = useState("");
+  const [notifyPhone, setNotifyPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [notifyError, setNotifyError] = useState("");
+
+  const openNotifyModal = (appId: UpcomingAppId) => {
+    setSelectedApps(new Set([appId]));
+    setNotifyEmail("");
+    setNotifyPhone("");
+    setSubmitted(false);
+    setNotifyError("");
+    setNotifyModal(appId);
+  };
+
+  const toggleApp = (appId: UpcomingAppId) => {
+    setSelectedApps((prev) => {
+      const next = new Set(prev);
+      if (next.has(appId)) {
+        next.delete(appId);
+      } else {
+        next.add(appId);
+      }
+      return next;
+    });
+  };
+
+  const handleNotifySubmit = async () => {
+    if (!notifyEmail && !notifyPhone) {
+      setNotifyError("Please enter an email or phone number.");
+      return;
+    }
+    if (selectedApps.size === 0) {
+      setNotifyError("Please select at least one app.");
+      return;
+    }
+    setNotifyError("");
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: notifyEmail || undefined,
+          phone: notifyPhone || undefined,
+          apps: Array.from(selectedApps),
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setNotifyError(data.error || "Something went wrong.");
+      } else {
+        setSubmitted(true);
+        setTimeout(() => setNotifyModal(null), 2000);
+      }
+    } catch {
+      setNotifyError("Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 10);
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+    return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNotifyPhone(formatPhone(e.target.value));
+  };
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    if (/iPad|iPhone|iPod/.test(ua)) {
+      setPlatform("ios");
+    } else if (/Android/.test(ua)) {
+      setPlatform("android");
+    }
+  }, []);
 
   useEffect(() => {
     const gradient = gradientRef.current;
@@ -46,8 +155,40 @@ export default function Home() {
     setTilt({ x: 0, y: 0 });
   };
 
-  const handleCloseModal = () => {
-    setActiveApp(null);
+  const appleIcon = (
+    <svg className="w-3.5 h-3.5" viewBox="0 0 384 512" fill="currentColor">
+      <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-62.1 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z" />
+    </svg>
+  );
+
+  const renderAppStoreCta = (app: "swipecardz" | "goldenloopz") => {
+    if (platform === "ios") {
+      return (
+        <a
+          href={APP_STORE_LINKS[app]}
+          className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors inline-flex items-center gap-1.5"
+        >
+          {appleIcon}
+          App Store
+        </a>
+      );
+    }
+    if (platform === "android") {
+      return (
+        <p className="text-[11px] text-gray-400 text-center">
+          iOS only — Google Play coming soon!
+        </p>
+      );
+    }
+    return (
+      <button
+        className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+        onClick={() => setQrModal(app)}
+      >
+        {appleIcon}
+        App Store
+      </button>
+    );
   };
 
   return (
@@ -81,58 +222,34 @@ export default function Home() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 px-8 py-6">
+      <header className="relative z-10 px-8 py-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
           plymouth app labs
         </h1>
+        <Link
+          href="/terms"
+          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          Terms & Support
+        </Link>
       </header>
 
       {/* Main content */}
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-120px)] px-8 py-16">
-        <div className="flex flex-row items-start gap-12">
+      <main className="relative z-10 flex flex-col items-center px-6 py-8 md:px-8 md:py-12">
+        <h2 className="text-2xl md:text-4xl font-bold text-gray-900 tracking-tight text-center mb-2">
+          Premium utility apps<br /> without monthly fees.
+        </h2>
+        <p className="text-base md:text-lg text-gray-500 text-center mb-8 md:mb-12">
+          High quality design & usability without subscriptions.
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 max-w-[700px] justify-items-center">
           {/* SwipeCardz */}
           <div className="flex flex-col items-center gap-2 relative">
-            {/* Dialog Box */}
-            {activeApp === "swipecardz" && (
-              <div className="absolute bottom-full mb-4 z-50">
-                <div
-                  className="bg-white rounded-xl shadow-2xl p-4 w-48 border border-gray-200"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex flex-col gap-2">
-                    <Link
-                      href="/swipecardz/support"
-                      className="w-full px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors text-center text-sm"
-                      onClick={handleCloseModal}
-                    >
-                      Support
-                    </Link>
-                    <Link
-                      href="/swipecardz/privacy-policy"
-                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
-                      onClick={handleCloseModal}
-                    >
-                      Privacy Policy
-                    </Link>
-                    <Link
-                      href="/swipecardz/terms-of-service"
-                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
-                      onClick={handleCloseModal}
-                    >
-                      Terms of Service
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* App Icon */}
             <div
-              className="relative cursor-pointer transition-transform duration-100 ease-out"
+              className="relative transition-transform duration-100 ease-out"
               onMouseEnter={() => setHoveredApp("swipecardz")}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onClick={() => setActiveApp(activeApp === "swipecardz" ? null : "swipecardz")}
               style={{
                 transform:
                   hoveredApp === "swipecardz"
@@ -146,61 +263,28 @@ export default function Home() {
                 width={180}
                 height={180}
                 priority
-                className="w-[180px] h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
                 style={{
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
                 }}
               />
             </div>
-            {/* App Name Label */}
-            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[180px]">
-              SwipeCardz
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
+              Swipe Cardz
             </h2>
+            <p className="text-xs text-gray-400 text-center max-w-[120px] md:max-w-[180px] leading-snug">
+              Simple, swipeable study.
+            </p>
+            {renderAppStoreCta("swipecardz")}
           </div>
 
           {/* Golden Loopz */}
           <div className="flex flex-col items-center gap-2 relative">
-            {/* Dialog Box */}
-            {activeApp === "goldenloopz" && (
-              <div className="absolute bottom-full mb-4 z-50">
-                <div
-                  className="bg-white rounded-xl shadow-2xl p-4 w-48 border border-gray-200"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex flex-col gap-2">
-                    <Link
-                      href="/goldenloopz/support"
-                      className="w-full px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors text-center text-sm"
-                      onClick={handleCloseModal}
-                    >
-                      Support
-                    </Link>
-                    <Link
-                      href="/goldenloopz/privacy-policy"
-                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
-                      onClick={handleCloseModal}
-                    >
-                      Privacy Policy
-                    </Link>
-                    <Link
-                      href="/goldenloopz/terms-of-service"
-                      className="w-full px-4 py-2.5 bg-gray-100 text-gray-900 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center text-sm"
-                      onClick={handleCloseModal}
-                    >
-                      Terms of Service
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* App Icon */}
             <div
-              className="relative cursor-pointer transition-transform duration-100 ease-out"
+              className="relative transition-transform duration-100 ease-out"
               onMouseEnter={() => setHoveredApp("goldenloopz")}
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
-              onClick={() => setActiveApp(activeApp === "goldenloopz" ? null : "goldenloopz")}
               style={{
                 transform:
                   hoveredApp === "goldenloopz"
@@ -214,19 +298,315 @@ export default function Home() {
                 width={180}
                 height={180}
                 priority
-                className="w-[180px] h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
                 style={{
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
                 }}
               />
             </div>
-            {/* App Name Label */}
-            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[180px]">
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
               Golden Loopz
             </h2>
+            <p className="text-xs text-gray-400 text-center max-w-[120px] md:max-w-[180px] leading-snug">
+              Daily habits for builders.
+            </p>
+            {renderAppStoreCta("goldenloopz")}
+          </div>
+
+          {/* Brain Tunez */}
+          <div className="flex flex-col items-center gap-2 relative">
+            <div
+              className="relative transition-transform duration-100 ease-out"
+              onMouseEnter={() => setHoveredApp("braintunez")}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{
+                transform:
+                  hoveredApp === "braintunez"
+                    ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.05)`
+                    : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
+              }}
+            >
+              <Image
+                src="/Focus-Icon.png"
+                alt="Brain Tunez"
+                width={180}
+                height={180}
+                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                style={{
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                }}
+              />
+            </div>
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
+              Brain Tunez
+            </h2>
+            <p className="text-xs text-gray-400 text-center max-w-[120px] md:max-w-[180px] leading-snug">
+              Timer + distraction-free music.
+            </p>
+            <button
+              className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+              onClick={() => openNotifyModal("braintunez")}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              Get Notified
+            </button>
+          </div>
+
+          {/* SquirrelSafe */}
+          <div className="flex flex-col items-center gap-2 relative">
+            <div
+              className="relative transition-transform duration-100 ease-out"
+              onMouseEnter={() => setHoveredApp("squirrelsafe")}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{
+                transform:
+                  hoveredApp === "squirrelsafe"
+                    ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.05)`
+                    : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
+              }}
+            >
+              <Image
+                src="/Photo Vault - Icon.png"
+                alt="SquirrelSafe"
+                width={180}
+                height={180}
+                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                style={{
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                }}
+              />
+            </div>
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
+              Squirrel Safe
+            </h2>
+            <p className="text-xs text-gray-400 text-center max-w-[120px] md:max-w-[180px] leading-snug">
+              Private photo & video lock.
+            </p>
+            <button
+              className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+              onClick={() => openNotifyModal("squirrelsafe")}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              Get Notified
+            </button>
+          </div>
+
+          {/* WhiteNoize */}
+          <div className="flex flex-col items-center gap-2 relative">
+            <div
+              className="relative transition-transform duration-100 ease-out"
+              onMouseEnter={() => setHoveredApp("whitenoize")}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{
+                transform:
+                  hoveredApp === "whitenoize"
+                    ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.05)`
+                    : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
+              }}
+            >
+              <Image
+                src="/Fan-icon.png"
+                alt="WhiteNoize"
+                width={180}
+                height={180}
+                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                style={{
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                }}
+              />
+            </div>
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
+              White Noize
+            </h2>
+            <p className="text-xs text-gray-400 text-center max-w-[120px] md:max-w-[180px] leading-snug">
+              Calming noise & smart alarms.
+            </p>
+            <button
+              className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+              onClick={() => openNotifyModal("whitenoize")}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              Get Notified
+            </button>
+          </div>
+
+          {/* Repz */}
+          <div className="flex flex-col items-center gap-2 relative">
+            <div
+              className="relative transition-transform duration-100 ease-out"
+              onMouseEnter={() => setHoveredApp("repz")}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+              style={{
+                transform:
+                  hoveredApp === "repz"
+                    ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.05)`
+                    : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
+              }}
+            >
+              <Image
+                src="/Muscle-Icon.png"
+                alt="Repz"
+                width={180}
+                height={180}
+                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
+                style={{
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+                }}
+              />
+            </div>
+            <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
+              Repz
+            </h2>
+            <p className="text-xs text-gray-400 text-center max-w-[120px] md:max-w-[180px] leading-snug">
+              Track sets, reps & weight.
+            </p>
+            <button
+              className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+              onClick={() => openNotifyModal("repz")}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              Get Notified
+            </button>
           </div>
         </div>
       </main>
+
+      {/* QR Code Modal */}
+      {qrModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setQrModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4 max-w-xs w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-900">
+              {QR_LABELS[qrModal]}
+            </h3>
+            <p className="text-sm text-gray-500 text-center">
+              Scan to download from the App Store
+            </p>
+            <Image
+              src={QR_IMAGES[qrModal]}
+              alt={`${QR_LABELS[qrModal]} QR Code`}
+              width={200}
+              height={200}
+              className="w-[200px] h-[200px]"
+            />
+            <button
+              className="mt-2 px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm cursor-pointer"
+              onClick={() => setQrModal(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Notify Modal */}
+      {notifyModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+          onClick={() => setNotifyModal(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4 max-w-sm w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {submitted ? (
+              <>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  You&apos;re on the list!
+                </h3>
+                <p className="text-sm text-gray-500 text-center">
+                  We&apos;ll notify you when your selected apps launch.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Get notified at launch
+                </h3>
+                <div className="grid grid-cols-2 gap-3 w-full">
+                  {UPCOMING_APPS.map((app) => (
+                    <button
+                      key={app.id}
+                      type="button"
+                      className={`relative flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-colors cursor-pointer ${
+                        selectedApps.has(app.id)
+                          ? "border-green-500 bg-green-50/50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                      onClick={() => toggleApp(app.id)}
+                    >
+                      {selectedApps.has(app.id) && (
+                        <span className="absolute top-1.5 right-1.5 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </span>
+                      )}
+                      <Image
+                        src={app.icon}
+                        alt={app.name}
+                        width={48}
+                        height={48}
+                        className="w-12 h-12 rounded-[22%]"
+                      />
+                      <span className="text-xs font-medium text-gray-700">
+                        {app.name}
+                      </span>
+                      <span className="text-[10px] text-gray-400 leading-tight text-center">
+                        {app.subtitle}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <input
+                  type="email"
+                  placeholder="Email (optional)"
+                  value={notifyEmail}
+                  onChange={(e) => setNotifyEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                />
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  placeholder="Phone (optional)"
+                  value={notifyPhone}
+                  onChange={handlePhoneChange}
+                  maxLength={12}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                />
+                <p className="text-[11px] text-gray-400 text-center">
+                  Enter an email or phone number (or both)
+                </p>
+                {notifyError && (
+                  <p className="text-xs text-red-500 text-center">{notifyError}</p>
+                )}
+                <button
+                  className="w-full px-4 py-2.5 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleNotifySubmit}
+                  disabled={submitting}
+                >
+                  {submitting ? "Submitting..." : "Notify Me"}
+                </button>
+                <button
+                  className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm cursor-pointer"
+                  onClick={() => setNotifyModal(null)}
+                >
+                  Close
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
