@@ -3,8 +3,8 @@ import Link from "next/link";
 
 export default function SiteHeader() {
   return (
-    <header className="px-8 py-4">
-      <Link href="/" className="inline-flex items-center gap-2">
+    <header className="px-4 py-3 md:px-8 md:py-4">
+      <Link href="/" className="inline-flex items-center gap-1.5">
         <Image
           src="/Plymouth App Labs Logo_Square.png"
           alt="Plymouth App Labs"
