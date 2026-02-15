@@ -13,8 +13,44 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Plymouth App Labs - SwipeCardz",
-  description: "Plymouth App Labs - Discover SwipeCardz and other innovative apps",
+  metadataBase: new URL("https://plymouthapplabs.com"),
+  title: {
+    default: "Plymouth App Labs — Premium Utility iOS Apps",
+    template: "%s | Plymouth App Labs",
+  },
+  description:
+    "Discover premium utility apps without monthly fees.",
+  keywords: [
+    "Plymouth App Labs",
+    "SwipeCardz",
+    "Golden Loopz",
+    "flashcard app",
+    "study app",
+    "AP Psychology",
+    "SAT prep",
+    "utility apps",
+    "iOS apps",
+  ],
+  openGraph: {
+    title: "Plymouth App Labs — Premium Utility iOS Apps",
+    description:
+      "Discover premium utility apps without monthly fees.",
+    url: "https://plymouthapplabs.com",
+    siteName: "Plymouth App Labs",
+    type: "website",
+    images: ["/og-image.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Plymouth App Labs — Premium Utility iOS Apps",
+    description:
+      "Discover premium utility apps without monthly fees.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -27,6 +63,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Plymouth App Labs",
+              url: "https://plymouthapplabs.com",
+              description:
+                "Premium utility apps built for everyday life.",
+            }),
+          }}
+        />
         {children}
       </body>
     </html>

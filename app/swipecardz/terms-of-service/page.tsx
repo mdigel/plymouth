@@ -36,7 +36,7 @@ export default function TermsOfServicePage() {
               1. Acceptance of Terms
             </h2>
             <p className="text-base leading-7 text-gray-700">
-              By downloading, installing, or using SwipeCardz ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App.
+              By downloading, installing, or using SwipeCardz (&ldquo;the App&rdquo;), you agree to be bound by these Terms of Service (&ldquo;Terms&rdquo;). If you do not agree to these Terms, do not use the App.
             </p>
           </section>
 
@@ -67,14 +67,14 @@ export default function TermsOfServicePage() {
               4.1 Lifetime Unlimited Access
             </h3>
             <p className="text-base leading-7 text-gray-700 mb-4">
-              SwipeCardz offers a one-time, non-consumable in-app purchase ("Lifetime Unlimited") that grants permanent access to core premium features, including unlimited deck creation.
+              SwipeCardz offers a one-time, non-consumable in-app purchase (&ldquo;Lifetime Unlimited&rdquo;) that grants permanent access to core premium features, including unlimited deck creation.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">
               4.2 AI-Powered Features
             </h3>
             <p className="text-base leading-7 text-gray-700 mb-4">
-              SwipeCardz may offer AI-powered features ("AI Features") that are separate from the Lifetime Unlimited purchase. AI Features may be offered as:
+              SwipeCardz may offer AI-powered features (&ldquo;AI Features&rdquo;) that are separate from the Lifetime Unlimited purchase. AI Features may be offered as:
             </p>
             <ul className="list-disc list-inside space-y-2 text-base leading-7 text-gray-700 ml-4 mb-4">
               <li>Separate one-time purchases</li>
@@ -96,7 +96,7 @@ export default function TermsOfServicePage() {
               4.4 Payment Processing
             </h3>
             <p className="text-base leading-7 text-gray-700 mb-4">
-              All payments are processed through Apple's App Store. By making a purchase, you also agree to Apple's terms and conditions.
+              All payments are processed through Apple&apos;s App Store. By making a purchase, you also agree to Apple&apos;s terms and conditions.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">
@@ -174,14 +174,14 @@ export default function TermsOfServicePage() {
               8.1 Google Sheets Integration
             </h3>
             <p className="text-base leading-7 text-gray-700 mb-4">
-              The App allows importing flashcards from Google Sheets. Your use of Google Sheets is subject to Google's terms of service. We are not responsible for the availability or functionality of Google Sheets.
+              The App allows importing flashcards from Google Sheets. Your use of Google Sheets is subject to Google&apos;s terms of service. We are not responsible for the availability or functionality of Google Sheets.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3 mt-6">
               8.2 App Store
             </h3>
             <p className="text-base leading-7 text-gray-700">
-              The App is distributed through Apple's App Store. Your use of the App Store is subject to Apple's terms and conditions.
+              The App is distributed through Apple&apos;s App Store. Your use of the App Store is subject to Apple&apos;s terms and conditions.
             </p>
           </section>
 
@@ -190,7 +190,7 @@ export default function TermsOfServicePage() {
               9. Disclaimer of Warranties
             </h2>
             <p className="text-base leading-7 text-gray-700 mb-4 uppercase font-medium">
-              The App is provided "as is" and "as available" without warranties of any kind, either express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
+              The App is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo; without warranties of any kind, either express or implied, including but not limited to implied warranties of merchantability, fitness for a particular purpose, and non-infringement.
             </p>
             <p className="text-base leading-7 text-gray-700 mb-4">
               We do not warrant that:
@@ -222,7 +222,7 @@ export default function TermsOfServicePage() {
               11. Indemnification
             </h2>
             <p className="text-base leading-7 text-gray-700">
-              You agree to indemnify and hold harmless SwipeCardz and its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys' fees) arising out of your use of the App or violation of these Terms.
+              You agree to indemnify and hold harmless SwipeCardz and its officers, directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including attorneys&apos; fees) arising out of your use of the App or violation of these Terms.
             </p>
           </section>
 
@@ -231,7 +231,7 @@ export default function TermsOfServicePage() {
               12. Changes to Terms
             </h2>
             <p className="text-base leading-7 text-gray-700">
-              We reserve the right to modify these Terms at any time. We will notify users of any material changes by updating the "Last Updated" date at the top of this document. Your continued use of the App after such changes constitutes acceptance of the new Terms.
+              We reserve the right to modify these Terms at any time. We will notify users of any material changes by updating the &ldquo;Last Updated&rdquo; date at the top of this document. Your continued use of the App after such changes constitutes acceptance of the new Terms.
             </p>
           </section>
 

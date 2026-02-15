@@ -143,7 +143,7 @@ export default function PrivacyPolicyPage() {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              9. Children's Privacy
+              9. Children&apos;s Privacy
             </h2>
             <p className="text-base leading-7 text-gray-700">
               SwipeCardz is intended for users aged 13 and older. We do not knowingly collect personal information from children under 13. If you are a parent and believe your child has provided us with personal information, please contact us.
@@ -164,7 +164,7 @@ export default function PrivacyPolicyPage() {
               11. Changes to This Policy
             </h2>
             <p className="text-base leading-7 text-gray-700">
-              We may update this privacy policy from time to time. We will notify you of any significant changes by posting the new policy in the app and updating the "Last Updated" date.
+              We may update this privacy policy from time to time. We will notify you of any significant changes by posting the new policy in the app and updating the &ldquo;Last Updated&rdquo; date.
             </p>
           </section>
         </div>
