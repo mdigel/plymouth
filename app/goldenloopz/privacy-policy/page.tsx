@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { Metadata } from "next";
+import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "Golden Loopz Privacy Policy | Plymouth App Labs",
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <div className="relative min-h-screen bg-white">
+      <SiteHeader />
       <div className="max-w-3xl mx-auto px-8 py-16">
         <div className="flex flex-col items-center mb-8">
           <Image

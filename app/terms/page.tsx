@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "Terms & Support | Plymouth App Labs",
@@ -32,13 +33,8 @@ const apps = [
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-white">
+      <SiteHeader />
       <div className="max-w-3xl mx-auto px-8 py-16">
-        <Link
-          href="/"
-          className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          &larr; Back to Home
-        </Link>
 
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight mt-6 mb-2">
           Terms & Support

@@ -223,14 +223,19 @@ export default function Home() {
 
       {/* Header */}
       <header className="relative z-10 px-8 py-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">
-          plymouth app labs
-        </h1>
-        <Link
-          href="/terms"
-          className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          Terms & Support
+        <Link href="/" className="inline-flex items-center gap-2">
+          <Image
+            src="/Plymouth App Labs Logo_Square.png"
+            alt="Plymouth App Labs"
+            width={40}
+            height={40}
+            priority
+            className="w-9 h-9 md:w-10 md:h-10"
+          />
+          <span className="text-lg md:text-xl text-gray-900 tracking-tight">
+            <span className="font-bold">plymouth</span>{" "}
+            <span className="font-light">app labs</span>
+          </span>
         </Link>
       </header>
 
@@ -607,6 +612,21 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="relative z-10 mt-16 border-t border-gray-100 px-8 py-8">
+        <div className="max-w-[700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Plymouth App Labs. All rights reserved.</p>
+          <div className="flex gap-4">
+            <Link href="/terms" className="hover:text-gray-600 transition-colors">
+              Terms & Support
+            </Link>
+            <a href="mailto:support@plymouthapplabs.com" className="hover:text-gray-600 transition-colors">
+              Contact
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
