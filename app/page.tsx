@@ -166,7 +166,10 @@ export default function Home() {
       return (
         <a
           href={APP_STORE_LINKS[app]}
-          className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors inline-flex items-center gap-1.5"
+          className="text-xs px-3 py-1.5 text-white rounded-full font-medium transition-colors inline-flex items-center gap-1.5"
+          style={{ backgroundColor: "#635BFF" }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5249E6")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#635BFF")}
         >
           {appleIcon}
           App Store
@@ -182,7 +185,10 @@ export default function Home() {
     }
     return (
       <button
-        className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors cursor-pointer inline-flex items-center gap-1.5"
+        className="text-xs px-3 py-1.5 text-white rounded-full font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"
+        style={{ backgroundColor: "#635BFF" }}
+        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5249E6")}
+        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#635BFF")}
         onClick={() => setQrModal(app)}
       >
         {appleIcon}
