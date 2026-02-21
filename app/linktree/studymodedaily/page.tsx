@@ -46,19 +46,19 @@ export default function StudyModeDailyPage() {
       <div className="max-w-xl mx-auto px-6 py-16">
         <div className="flex flex-col items-center mb-10">
           <Image
-            src="/swipecardz.png"
-            alt="SwipeCardz"
+            src="/StudyModeDaily_Logo.png"
+            alt="StudyModeDaily"
             width={100}
             height={100}
             priority
-            className="w-[100px] h-[100px] rounded-[22%] shadow-lg mb-5"
+            className="w-[100px] h-[100px] rounded-full shadow-lg mb-5"
             style={{
               boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
             }}
           />
           <h1 className="text-2xl font-bold text-gray-900">@StudyModeDaily</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Free study decks for SwipeCardz
+            Free study decks for the SAT & AP Psych
           </p>
         </div>
 
