@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import StarburstCanvas from "@/components/Starburst";
 
 type HoveredApp = "swipecardz" | "goldenloopz" | "braintunez" | "squirrelsafe" | "whitenoize" | "repz" | null;
 type Platform = "ios" | "android" | "desktop";
@@ -32,7 +33,6 @@ const QR_LABELS = {
 };
 
 export default function Home() {
-  const gradientRef = useRef<HTMLDivElement>(null);
   const [hoveredApp, setHoveredApp] = useState<HoveredApp>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [platform, setPlatform] = useState<Platform>("desktop");
@@ -121,18 +121,6 @@ export default function Home() {
     }
   }, []);
 
-  useEffect(() => {
-    const gradient = gradientRef.current;
-    if (!gradient) return;
-
-    let position = 0;
-    const animate = () => {
-      position += 0.5;
-      gradient.style.backgroundPosition = `${position}% 50%`;
-      requestAnimationFrame(animate);
-    };
-    animate();
-  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -199,45 +187,70 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-white overflow-hidden">
-      {/* Background layers */}
+      {/* Background — Stripe-inspired drifting gradient mesh */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        {/* Animated soft gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f6f9fc] to-[#e9ecef]" />
         <div
-          ref={gradientRef}
-          className="absolute inset-0 opacity-70"
+          className="absolute w-[600px] h-[600px] rounded-full blur-[120px] opacity-30"
           style={{
-            background:
-              "linear-gradient(120deg, #f9fafb 0%, #eef2ff 25%, #fdf2ff 50%, #e0f2fe 75%, #f9fafb 100%)",
-            backgroundSize: "200% 200%",
+            background: "radial-gradient(circle, #635BFF, transparent 70%)",
+            top: "-10%",
+            left: "-10%",
+            animation: "drift1 20s ease-in-out infinite",
           }}
         />
-
-        {/* Glow blobs */}
-        <div className="absolute -top-40 -left-32 h-80 w-80 rounded-full bg-gradient-to-br from-sky-100 via-indigo-100 to-purple-100 blur-3xl opacity-80" />
-        <div className="absolute -bottom-40 -right-32 h-80 w-80 rounded-full bg-gradient-to-tr from-amber-100 via-rose-100 to-pink-100 blur-3xl opacity-80" />
-
-        {/* Subtle grid overlay */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute w-[500px] h-[500px] rounded-full blur-[120px] opacity-35"
           style={{
-            backgroundImage:
-              "linear-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
+            background: "radial-gradient(circle, #80E9FF, transparent 70%)",
+            top: "10%",
+            right: "5%",
+            animation: "drift2 18s ease-in-out infinite",
           }}
         />
+        <div
+          className="absolute w-[550px] h-[550px] rounded-full blur-[120px] opacity-30"
+          style={{
+            background: "radial-gradient(circle, #FF80B5, transparent 70%)",
+            bottom: "5%",
+            left: "15%",
+            animation: "drift3 16s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute w-[450px] h-[450px] rounded-full blur-[100px] opacity-30"
+          style={{
+            background: "radial-gradient(circle, #0ACF83, transparent 70%)",
+            top: "40%",
+            left: "40%",
+            animation: "drift1 20s ease-in-out infinite reverse",
+          }}
+        />
+        <style>{`
+          @keyframes drift1 {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(100px, 60px); }
+            50% { transform: translate(-50px, 120px); }
+            75% { transform: translate(70px, -40px); }
+          }
+          @keyframes drift2 {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-80px, 50px); }
+            50% { transform: translate(60px, -70px); }
+            75% { transform: translate(-40px, 90px); }
+          }
+          @keyframes drift3 {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(50px, -80px); }
+            50% { transform: translate(-90px, 40px); }
+            75% { transform: translate(40px, 70px); }
+          }
+        `}</style>
       </div>
 
       {/* Header */}
       <header className="relative z-10 px-4 py-3 md:px-8 md:py-6 flex items-center justify-between">
         <Link href="/" className="inline-flex items-center gap-1.5">
-          {/* <Image
-            src="/Plymouth App Labs Logo_Square.png"
-            alt="Plymouth App Labs"
-            width={40}
-            height={40}
-            priority
-            className="w-9 h-9 md:w-10 md:h-10"
-          /> */}
           <span className="text-lg md:text-xl text-gray-900 tracking-tight">
             <span className="font-bold">plymouth</span>{" "}
             <span className="font-light">app labs</span>
@@ -486,6 +499,23 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Starburst + Mascot */}
+      <section className="relative z-10 w-full h-[300px] md:h-[380px] mb-12 md:mb-16 overflow-visible">
+        <StarburstCanvas />
+        <div className="absolute inset-0 flex flex-col items-center pointer-events-none" style={{ top: '77%', transform: 'translateY(-50%)' }}>
+          <Image
+            src="/PlymouthMascot.png"
+            alt="Plym — Plymouth App Labs mascot"
+            width={200}
+            height={140}
+            className="w-48 md:w-64 h-auto mb-2 pointer-events-auto"
+          />
+          <p className="text-xs text-gray-400 text-center pointer-events-auto">
+            Meet Plym, our mascot.
+          </p>
+        </div>
+      </section>
+
       {/* QR Code Modal */}
       {qrModal && (
         <div
@@ -620,7 +650,7 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="relative z-10 mt-16 border-t border-gray-100 px-8 py-8">
+      <footer className="relative z-10 mt-4 border-t border-gray-100 px-8 py-8">
         <div className="max-w-[700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
           <p>&copy; {new Date().getFullYear()} Plymouth App Labs. All rights reserved.</p>
           <div className="flex gap-4">
