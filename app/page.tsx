@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import posthog from "posthog-js";
 import StarburstCanvas from "@/components/Starburst";
 
 type HoveredApp = "swipecardz" | "goldenloopz" | "braintunez" | "squirrelsafe" | "whitenoize" | "repz" | null;
@@ -46,6 +47,7 @@ export default function Home() {
   const [notifyError, setNotifyError] = useState("");
 
   const openNotifyModal = (appId: UpcomingAppId) => {
+    posthog.capture("get_notified_click", { app: appId, page: "homepage" });
     setSelectedApps(new Set([appId]));
     setNotifyEmail("");
     setNotifyPhone("");
@@ -158,6 +160,7 @@ export default function Home() {
           style={{ backgroundColor: "#635BFF" }}
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5249E6")}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#635BFF")}
+          onClick={() => posthog.capture("app_store_click", { app, page: "homepage", platform })}
         >
           {appleIcon}
           App Store
@@ -177,7 +180,7 @@ export default function Home() {
         style={{ backgroundColor: "#635BFF" }}
         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5249E6")}
         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#635BFF")}
-        onClick={() => setQrModal(app)}
+        onClick={() => { posthog.capture("app_store_click", { app, page: "homepage", platform }); setQrModal(app); }}
       >
         {appleIcon}
         App Store
@@ -406,7 +409,7 @@ export default function Home() {
               Squirrel Safe
             </h2>
             <p className="text-xs text-gray-400 text-center max-w-[120px] md:max-w-[180px] leading-snug">
-              Private photo & video lock.
+              Private photo & video vault.
             </p>
             <button
               className="text-xs px-3 py-1.5 bg-gray-900 text-white rounded-full font-medium hover:bg-gray-800 transition-colors cursor-pointer inline-flex items-center gap-1.5"
@@ -500,7 +503,7 @@ export default function Home() {
       </main>
 
       {/* Starburst + Mascot */}
-      <section className="relative z-10 w-full h-[300px] md:h-[380px] mb-12 md:mb-16 overflow-visible">
+      <section className="relative z-10 w-full h-[300px] md:h-[380px] mb-24 md:mb-32 overflow-visible">
         <StarburstCanvas />
         <div className="absolute inset-0 flex flex-col items-center pointer-events-none" style={{ top: '77%', transform: 'translateY(-50%)' }}>
           <Image

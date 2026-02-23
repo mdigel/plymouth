@@ -1,11 +1,7 @@
-import Image from "next/image";
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "StudyModeDaily",
-  description:
-    "Free study decks for DSAT 2026 and AP Psychology. Import directly into SwipeCardz.",
-};
+import Image from "next/image";
+import posthog from "posthog-js";
 
 const groups = [
   {
@@ -75,6 +71,7 @@ export default function StudyModeDailyPage() {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => posthog.capture("link_click", { title: link.title, group: group.label, page: "linktree/studymodedaily" })}
                     className="flex items-center gap-4 w-full rounded-xl border border-gray-200 bg-white px-5 py-4 text-left text-base font-medium text-gray-900 shadow-sm transition-all hover:shadow-md hover:border-gray-300 hover:bg-gray-50"
                   >
                     <svg
@@ -109,6 +106,7 @@ export default function StudyModeDailyPage() {
           <a
             href="https://plymouthapplabs.com"
             className="underline hover:text-gray-600"
+            onClick={() => posthog.capture("link_click", { title: "Plymouth App Labs", page: "linktree/studymodedaily" })}
           >
             Plymouth App Labs
           </a>
