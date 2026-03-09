@@ -120,7 +120,7 @@ export default function SwipeCardzPage() {
 
       <footer className="border-t border-gray-100 py-8 px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-          <span>&copy; {new Date().getFullYear()} Plymouth App Labs</span>
+          <span>&copy; {new Date().getFullYear()} Plymouth App Labs, a Jitterliss, Inc. company. All rights reserved.</span>
           <div className="flex gap-6">
             <Link href="/swipecardz/privacy-policy" className="hover:text-gray-600 transition-colors">
               Privacy Policy

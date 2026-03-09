@@ -655,7 +655,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="relative z-10 mt-4 border-t border-gray-100 px-8 py-8">
         <div className="max-w-[700px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400">
-          <p>&copy; {new Date().getFullYear()} Plymouth App Labs. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Plymouth App Labs, a Jitterliss, Inc. company. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/terms" className="hover:text-gray-600 transition-colors">
               Terms & Support
