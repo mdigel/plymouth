@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import posthog from "posthog-js";
 import StarburstCanvas from "@/components/Starburst";
@@ -32,6 +32,35 @@ const QR_LABELS = {
   swipecardz: "Swipe Cardz",
   goldenloopz: "Golden Loopz",
 };
+
+function AppIcon({ src, alt, priority = false }: { src: string; alt: string; priority?: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    // A cached image can already be complete before onLoad fires, so check on mount.
+    if (imgRef.current?.complete) setLoaded(true);
+  }, []);
+
+  return (
+    <div className="relative w-[120px] h-[120px] md:w-[180px] md:h-[180px]">
+      {!loaded && (
+        <div className="absolute inset-0 rounded-[22%] bg-gray-200 animate-heartbeat" />
+      )}
+      <Image
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        width={180}
+        height={180}
+        priority={priority}
+        onLoad={() => setLoaded(true)}
+        className={`w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        style={{ boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)" }}
+      />
+    </div>
+  );
+}
 
 export default function Home() {
   const [hoveredApp, setHoveredApp] = useState<HoveredApp>(null);
@@ -284,17 +313,7 @@ export default function Home() {
                     : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
               }}
             >
-              <Image
-                src="/swipecardz.png"
-                alt="SwipeCardz"
-                width={180}
-                height={180}
-                priority
-                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
-                style={{
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-                }}
-              />
+              <AppIcon src="/swipecardz.png" alt="SwipeCardz" priority />
             </div>
             <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
               Swipe Cardz
@@ -319,17 +338,7 @@ export default function Home() {
                     : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
               }}
             >
-              <Image
-                src="/goldenloopzicon.png"
-                alt="Golden Loopz"
-                width={180}
-                height={180}
-                priority
-                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
-                style={{
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-                }}
-              />
+              <AppIcon src="/goldenloopzicon.png" alt="Golden Loopz" priority />
             </div>
             <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
               Golden Loopz
@@ -354,16 +363,7 @@ export default function Home() {
                     : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
               }}
             >
-              <Image
-                src="/Focus-Icon.png"
-                alt="Brain Tunez"
-                width={180}
-                height={180}
-                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
-                style={{
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-                }}
-              />
+              <AppIcon src="/Focus-Icon.png" alt="Brain Tunez" />
             </div>
             <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
               Brain Tunez
@@ -394,16 +394,7 @@ export default function Home() {
                     : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
               }}
             >
-              <Image
-                src="/Photo Vault - Icon.png"
-                alt="SquirrelSafe"
-                width={180}
-                height={180}
-                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
-                style={{
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-                }}
-              />
+              <AppIcon src="/Photo Vault - Icon.png" alt="SquirrelSafe" />
             </div>
             <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
               Squirrel Safe
@@ -434,16 +425,7 @@ export default function Home() {
                     : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
               }}
             >
-              <Image
-                src="/Fan-icon.png"
-                alt="WhiteNoize"
-                width={180}
-                height={180}
-                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
-                style={{
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-                }}
-              />
+              <AppIcon src="/Fan-icon.png" alt="WhiteNoize" />
             </div>
             <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
               White Noize
@@ -474,16 +456,7 @@ export default function Home() {
                     : "perspective(1000px) rotateX(0) rotateY(0) scale(1)",
               }}
             >
-              <Image
-                src="/Muscle-Icon.png"
-                alt="Repz"
-                width={180}
-                height={180}
-                className="w-[120px] h-[120px] md:w-[180px] md:h-[180px] rounded-[22%] shadow-lg pointer-events-none"
-                style={{
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-                }}
-              />
+              <AppIcon src="/Muscle-Icon.png" alt="Repz" />
             </div>
             <h2 className="text-[15px] font-normal text-gray-900 tracking-tight mt-1 text-center max-w-[120px] md:max-w-[180px]">
               Repz
@@ -504,7 +477,12 @@ export default function Home() {
 
       {/* Starburst + Mascot */}
       <section className="relative z-10 w-full h-[300px] md:h-[380px] mb-24 md:mb-32 overflow-visible">
-        <StarburstCanvas />
+        {/* Canvas is bottom-anchored and a bit taller than the section so the
+            burst gets headroom and overflows upward instead of being clipped.
+            The canvas itself is pointer-events:none, so the overflow is harmless. */}
+        <div className="absolute inset-x-0 bottom-0 h-[420px] md:h-[560px] pointer-events-none">
+          <StarburstCanvas />
+        </div>
         <div className="absolute inset-0 flex flex-col items-center pointer-events-none" style={{ top: '77%', transform: 'translateY(-50%)' }}>
           <Image
             src="/PlymouthMascot.png"

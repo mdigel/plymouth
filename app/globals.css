@@ -10,6 +10,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --animate-heartbeat: heartbeat 1.3s ease-in-out infinite;
+}
+
+/* Lub-dub double beat with a rest, for skeleton loaders. */
+@keyframes heartbeat {
+  0%   { transform: scale(1);    opacity: 0.5; }
+  14%  { transform: scale(1.05); opacity: 0.9; }
+  28%  { transform: scale(1);    opacity: 0.5; }
+  42%  { transform: scale(1.05); opacity: 0.9; }
+  70%  { transform: scale(1);    opacity: 0.5; }
+  100% { transform: scale(1);    opacity: 0.5; }
 }
 
 body {

@@ -12,6 +12,9 @@ const SPEED_MIN = 0.000225;
 const SPEED_MAX = 0.0007;
 const LENGTH_MIN = 0.32;
 const LENGTH_MAX = 0.48;
+// Burst origin sits this many px above the canvas bottom (keeps it on the mascot
+// regardless of how tall the canvas is, so the burst can overflow upward).
+const ORIGIN_FROM_BOTTOM = 70;
 
 function rayColor(t: number): [number, number, number] {
   const colors: [number, number, number][] = [
@@ -47,7 +50,7 @@ class Ray {
 
   reset(W: number, H: number) {
     this.ox = W * 0.5 + (Math.random() - 0.5) * 8;
-    this.oy = H * 0.82 + (Math.random() - 0.5) * 8;
+    this.oy = (H - ORIGIN_FROM_BOTTOM) + (Math.random() - 0.5) * 8;
     this.baseAngle = -(Math.PI * (0.02 + Math.random() * 0.96));
     this.angle = this.baseAngle;
     const diag = Math.hypot(W, H) / 2;
@@ -150,7 +153,7 @@ export default function StarburstCanvas() {
       rays.forEach(r => r.draw(ctx!, ts, mouse));
 
       // Bloom over origin
-      const ox = W * 0.5, oy = H * 0.82;
+      const ox = W * 0.5, oy = H - ORIGIN_FROM_BOTTOM;
       const bloom = ctx!.createRadialGradient(ox, oy, 0, ox, oy, 90);
       bloom.addColorStop(0,    'rgba(255, 220, 200, 1)');
       bloom.addColorStop(0.25, 'rgba(255, 210, 190, 0.92)');
@@ -166,36 +169,35 @@ export default function StarburstCanvas() {
       const rect = canvas!.getBoundingClientRect();
       mouse = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
-    function onMouseLeave() { mouse = { x: -9999, y: -9999 }; }
     function onTouchMove(e: TouchEvent) {
-      e.preventDefault();
       const rect = canvas!.getBoundingClientRect();
       mouse = { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
     }
     function onTouchEnd() { mouse = { x: -9999, y: -9999 }; }
 
     resize();
+    // Listen on the window (not the canvas) so the canvas can be
+    // pointer-events:none and overflow upward without blocking the buttons it
+    // overlaps. Touch is passive so page scrolling still works.
     window.addEventListener('resize', resize);
-    canvas.addEventListener('mousemove', onMouseMove);
-    canvas.addEventListener('mouseleave', onMouseLeave);
-    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
-    canvas.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd);
     rafId = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', resize);
-      canvas.removeEventListener('mousemove', onMouseMove);
-      canvas.removeEventListener('mouseleave', onMouseLeave);
-      canvas.removeEventListener('touchmove', onTouchMove);
-      canvas.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      style={{ display: 'block', width: '100%', height: '100%' }}
+      style={{ display: 'block', width: '100%', height: '100%', pointerEvents: 'none' }}
     />
   );
 }
